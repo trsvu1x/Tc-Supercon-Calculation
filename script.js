@@ -8,15 +8,23 @@ const PRECISION = { wlog: 2, lambda: 2, mustar: 3 };
 // Utility Functions
 // ============================================================================
 function get(id) {
-  return parseFloat(document.getElementById(id).value);
+  const element = document.getElementById(id) || document.getElementById(id + '-num');
+  if (!element || element.value === '') return NaN;
+  return parseFloat(element.value);
 }
 
 function setDisplayValue(id, value, suffix = '') {
-  document.getElementById(id).textContent = value + suffix;
+  const element = document.getElementById(id);
+  if (element) {
+    element.textContent = value + suffix;
+  }
 }
 
 function setInputValue(id, value) {
-  document.getElementById(id).value = value;
+  const element = document.getElementById(id) || document.getElementById(id + '-num');
+  if (element) {
+    element.value = value;
+  }
 }
 
 // ============================================================================
@@ -32,11 +40,15 @@ function sync(id) {
 
 function syncNum(id) {
   const value = get(id + '-num');
-  if (isNaN(value)) return;
+  if (Number.isNaN(value)) return;
 
-  const slider = document.getElementById(id);
-  if (value >= +slider.min && value <= +slider.max) {
-    slider.value = value;
+  const input = document.getElementById(id + '-num') || document.getElementById(id);
+  if (input) {
+    const min = Number(input.min);
+    const max = Number(input.max);
+    if (!Number.isNaN(min) && !Number.isNaN(max) && value >= min && value <= max) {
+      input.value = value;
+    }
   }
 
   const suffix = id === 'wlog' ? ' K' : '';
@@ -73,23 +85,92 @@ function compute() {
   const omega_log = get('wlog');
   const lambda = get('lambda');
   const mu_star = get('mustar');
+  const badgeEl = document.getElementById('regime-badge');
+
+  if ([omega_log, lambda, mu_star].some((value) => Number.isNaN(value))) {
+    setDisplayValue('tc-display', '—');
+    if (badgeEl) {
+      badgeEl.textContent = 'Valeurs invalides';
+      badgeEl.className = 'regime invalid';
+    }
+    return;
+  }
 
   const tc = mcmillan(omega_log, lambda, mu_star);
-  const displayEl = document.getElementById('tc-display');
-  const badgeEl = document.getElementById('regime-badge');
 
   if (tc === null) {
     setDisplayValue('tc-display', '—');
-    badgeEl.textContent = 'Non-supraconducteur';
-    badgeEl.className = 'regime invalid';
+    if (badgeEl) {
+      badgeEl.textContent = 'Non-supraconducteur';
+      badgeEl.className = 'regime invalid';
+    }
     return;
   }
 
   setDisplayValue('tc-display', tc.toFixed(2));
 
   const regime = getRegime(lambda);
-  badgeEl.textContent = regime.text;
-  badgeEl.className = `regime ${regime.class}`;
+  if (badgeEl) {
+    badgeEl.textContent = regime.text;
+    badgeEl.className = `regime ${regime.class}`;
+  }
+}
+
+function readLocalHistory() {
+  try {
+    const raw = localStorage.getItem('tc-history');
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalHistory(rows) {
+  try {
+    localStorage.setItem('tc-history', JSON.stringify(rows));
+  } catch {
+    // Ignore storage write errors.
+  }
+}
+
+function removeFromLocalHistory(id) {
+  const rows = readLocalHistory();
+  const filtered = rows.filter((row) => String(row.id) !== String(id));
+  writeLocalHistory(filtered);
+  return filtered;
+}
+
+function renderHistory(historyEl, rows) {
+  if (!historyEl) return;
+
+  if (!rows.length) {
+    historyEl.innerHTML = '<p class="empty">Aucun résultat sauvegardé</p>';
+    return;
+  }
+
+  const tableHtml = `
+    <table>
+      <tr>
+         <th>μ*</th>
+         <th>λ</th>
+         <th>ωlog (K)</th>
+         <th>Tc (K)</th>
+         <th>Date</th>
+         <th></th>
+      </tr>
+      ${rows.map(r => `
+      <tr>
+        <td>${r.mu_star?.toFixed(1) ?? '—'}</td>
+        <td>${r.lambda?.toFixed(2) ?? '—'}</td>
+        <td>${r.omega_log?.toFixed(1) ?? '—'}</td>
+        <td><b>${r.tc?.toFixed(2) ?? '—'}</b></td>
+        <td style="color:#aaa;font-family:system-ui">${r.created_at?.slice(0, 16) ?? ''}</td>
+        <td><span class="del" onclick="del(${r.id})">supprimer</span></td>
+      </tr>`).join('')}
+    </table>`;
+
+  historyEl.innerHTML = tableHtml;
 }
 
 // ============================================================================
@@ -100,61 +181,88 @@ async function save() {
   const lambda = get('lambda');
   const mu_star = get('mustar');
   const tc = mcmillan(omega_log, lambda, mu_star);
+  const historyEl = document.getElementById('history-body');
 
   if (tc === null) {
     alert('Paramètres invalides, rien à sauvegarder.');
     return;
   }
 
-  await fetch(API + '/calculate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      omega_log: omega_log,
-      lambda: lambda,
-      mu_star: mu_star
-    })
-  });
+  const entry = {
+    id: Date.now(),
+    omega_log,
+    lambda,
+    mu_star,
+    tc,
+    created_at: new Date().toISOString()
+  };
 
-  loadHistory();
+  try {
+    const response = await fetch(API + '/calculate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        omega_log: omega_log,
+        lambda: lambda,
+        mu_star: mu_star
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error('server response not ok');
+    }
+
+    const rows = readLocalHistory();
+    rows.unshift(entry);
+    writeLocalHistory(rows);
+    loadHistory();
+  } catch {
+    const rows = readLocalHistory();
+    rows.unshift(entry);
+    writeLocalHistory(rows);
+    renderHistory(historyEl, rows);
+  }
 }
 
 async function loadHistory() {
-  const response = await fetch(API + '/history');
-  const rows = await response.json();
   const historyEl = document.getElementById('history-body');
+  if (!historyEl) return;
 
-  if (!rows.length) {
-    historyEl.innerHTML = '<p class="empty">Aucun résultat sauvegardé</p>';
-    return;
+  try {
+    const response = await fetch(API + '/history');
+    if (!response.ok) {
+      throw new Error('server response not ok');
+    }
+
+    const rows = await response.json();
+    if (Array.isArray(rows) && rows.length) {
+      renderHistory(historyEl, rows);
+      return;
+    }
+  } catch {
+    // Fall back to the locally stored history when the server is unavailable.
   }
 
-  const tableHtml = `
-    <table>
-      <tr>
-        <th>ωlog (K)</th>
-        <th>λ</th>
-        <th>μ*</th>
-        <th>Tc (K)</th>
-        <th>Date</th>
-        <th></th>
-      </tr>
-      ${rows.map(r => `
-      <tr>
-        <td>${r.omega_log.toFixed(1)}</td>
-        <td>${r.lambda.toFixed(2)}</td>
-        <td>${r.mu_star.toFixed(3)}</td>
-        <td><b>${r.tc?.toFixed(2) ?? '—'}</b></td>
-        <td style="color:#aaa;font-family:system-ui">${r.created_at?.slice(0, 16) ?? ''}</td>
-        <td><span class="del" onclick="del(${r.id})">supprimer</span></td>
-      </tr>`).join('')}
-    </table>`;
-
-  historyEl.innerHTML = tableHtml;
+  const localRows = readLocalHistory();
+  renderHistory(historyEl, localRows);
 }
 
 async function del(id) {
-  await fetch(API + '/delete/' + id, { method: 'DELETE' });
+  const historyEl = document.getElementById('history-body');
+  const remainingRows = removeFromLocalHistory(id);
+  if (historyEl) {
+    renderHistory(historyEl, remainingRows);
+  }
+
+  try {
+    const response = await fetch(API + '/delete/' + id, { method: 'DELETE' });
+    if (!response.ok) {
+      throw new Error('server response not ok');
+    }
+  } catch {
+    // Keep the local update and fall back to the current local history.
+  }
+
   loadHistory();
 }
 
