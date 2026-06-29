@@ -1,0 +1,211 @@
+/* ============================================================================
+   RESET
+   ============================================================================ */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ============================================================================
+   LAYOUT
+   ============================================================================ */
+body {
+  font-family: system-ui, sans-serif;
+  background: #f5f5f5;
+  color: #222;
+}
+
+.container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+
+/* ============================================================================
+   TYPOGRAPHY
+   ============================================================================ */
+h1 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+h2 {
+  font-size: 15px;
+  margin-bottom: 12px;
+}
+
+.sub {
+  font-size: 13px;
+  color: #888;
+  margin-bottom: 24px;
+}
+
+/* ============================================================================
+   CARDS
+   ============================================================================ */
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid #e5e5e5;
+}
+
+/* ============================================================================
+   FORMULA DISPLAY
+   ============================================================================ */
+.formula {
+  font-family: monospace;
+  font-size: 13px;
+  background: #f8f8f8;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: #444;
+  line-height: 1.8;
+}
+
+/* ============================================================================
+   PARAMETERS
+   ============================================================================ */
+.param {
+  margin-bottom: 16px;
+}
+
+.param label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.param label span {
+  font-family: monospace;
+  font-weight: 600;
+  color: #1a6bb5;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: #1a6bb5;
+}
+
+input[type="number"] {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+/* ============================================================================
+   RESULT DISPLAY
+   ============================================================================ */
+.result {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.tc-value {
+  font-size: 52px;
+  font-weight: 700;
+  color: #1a6bb5;
+  font-family: monospace;
+  line-height: 1;
+}
+
+.tc-unit {
+  font-size: 20px;
+  color: #888;
+}
+
+/* ============================================================================
+   REGIME BADGE
+   ============================================================================ */
+.regime {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.weak {
+  background: #e1f5ee;
+  color: #0f6e56;
+}
+
+.moderate {
+  background: #e6f1fb;
+  color: #185fa5;
+}
+
+.strong {
+  background: #faece7;
+  color: #993c1d;
+}
+
+.invalid {
+  background: #fcebeb;
+  color: #a32d2d;
+}
+
+/* ============================================================================
+   BUTTON
+   ============================================================================ */
+button {
+  width: 100%;
+  padding: 11px;
+  background: #1a6bb5;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #155a99;
+}
+
+/* ============================================================================
+   TABLE
+   ============================================================================ */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+th {
+  text-align: left;
+  padding: 8px;
+  color: #888;
+  font-weight: 500;
+  border-bottom: 1px solid #eee;
+}
+
+td {
+  padding: 8px;
+  border-bottom: 1px solid #f0f0f0;
+  font-family: monospace;
+}
+
+.del {
+  color: #c0392b;
+  cursor: pointer;
+  font-size: 12px;
+  text-decoration: underline;
+  font-family: system-ui;
+}
+
+.empty {
+  text-align: center;
+  color: #aaa;
+  padding: 20px;
+  font-size: 13px;
+}

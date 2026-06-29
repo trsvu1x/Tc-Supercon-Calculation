@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>McMillan Tc Calculator</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body);"></script>
+</head>
+
+<body>
+  <div class="container">
+    <h1>McMillan T<sub>c</sub> Calculator</h1>
+    <p class="sub">Supraconductivité phononique · Théorie BCS–Eliashberg</p>
+
+    <!-- Formula -->
+    <div class="card">
+      <div class="formula">
+        $$T_c = \frac{\omega_{\log}}{1.2} \exp\left[\frac{-1.04(1+\lambda)}{\lambda - \mu^*(1 + 0.62\lambda)}\right]$$
+      </div>
+    </div>
+
+    <!-- Input Parameters -->
+    <div class="card">
+      <div class="param">
+        <label><b>ωlog</b><span id="wlog-val">300.0 K</span></label>
+        <input type="number" id="wlog-num" value="300.0" min="0.01" max="5000" step="0.01" oninput="syncNum('wlog')">
+      </div>
+
+      <div class="param">
+        <label><b>λ</b><span id="lambda-val">0.70</span></label>
+        <input type="number" id="lambda-num" value="0.70" min="0.01" max="10" step="0.01" oninput="syncNum('lambda')">
+      </div>
+
+      <div class="param">
+        <label><b>μ*</b><span id="mustar-val">0.100</span></label>
+        <input type="number" id="mustar-num" value="0.100" min="0" max="0.5" step="0.001" oninput="syncNum('mustar')">
+      </div>
+    </div>
+
+    <!-- Result -->
+    <div class="card result">
+      <div class="tc-value" id="tc-display">—</div>
+      <div class="tc-unit">K</div>
+      <div id="regime-badge" class="regime moderate">Couplage modéré</div>
+    </div>
+
+    <!-- Save -->
+    <div class="card">
+      <button onclick="save()">💾 Sauvegarder ce résultat</button>
+    </div>
+
+    <!-- History -->
+    <div class="card">
+      <h2>Historique</h2>
+      <div id="history-body"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+
+</body>
+
+</html>
