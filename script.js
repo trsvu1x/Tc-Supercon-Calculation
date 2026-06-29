@@ -164,7 +164,7 @@ function renderHistory(historyEl, rows) {
         <td>${r.mu_star?.toFixed(1) ?? '—'}</td>
         <td>${r.lambda?.toFixed(2) ?? '—'}</td>
         <td>${r.omega_log?.toFixed(1) ?? '—'}</td>
-        <td><b>${r.tc?.toFixed(2) ?? '—'}</b></td>
+        <td><b>${r.tc?.toFixed(1) ?? '—'}</b></td>
         <td style="color:#aaa;font-family:system-ui">${r.created_at?.slice(0, 16) ?? ''}</td>
         <td><span class="del" onclick="del(${r.id})">supprimer</span></td>
       </tr>`).join('')}
