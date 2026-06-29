@@ -1,16 +1,11 @@
-# McMillan Tc — version simple
+# McMillan Tc
 
-2 fichiers, 0 dépendances externes.
-
-## Démarrer
-
-**Terminal 1 — backend :**
+**Terminal 1 — Backend :**
 ```bash
 python server.py
 ```
 
-**Terminal 2 (ou double-clic) — frontend :**
-Ouvre `index.html` dans Brave.
+**Terminal — Frontend :**
+Run `index.html`
 
-C'est tout.
 #Tc-Supercon-Calculation
