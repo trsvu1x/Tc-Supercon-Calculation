@@ -209,3 +209,77 @@ td {
   padding: 20px;
   font-size: 13px;
 }
+
+/* ============================================================================
+   TWO-COLUMN PAGE LAYOUT
+   ============================================================================ */
+.page-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  min-height: 100vh;
+}
+
+.left-col {
+  flex: 0 0 420px;
+  min-width: 320px;
+}
+
+.left-col .container {
+  max-width: 420px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+
+.right-col {
+  flex: 1 1 0;
+  padding: 40px 24px 40px 8px;
+  min-width: 0;
+}
+
+/* Stack vertically on small screens */
+@media (max-width: 820px) {
+  .page-wrapper {
+    flex-direction: column;
+  }
+  .left-col {
+    flex: none;
+    width: 100%;
+  }
+  .right-col {
+    width: 100%;
+    padding: 0 16px 40px;
+  }
+}
+
+/* ============================================================================
+   CHART CARDS
+   ============================================================================ */
+.chart-card {
+  margin-bottom: 20px;
+}
+
+.chart-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 2px;
+  color: #222;
+}
+
+.chart-sub {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 14px;
+}
+
+.chart-params-label {
+  margin-top: 10px;
+  font-size: 11px;
+  color: #1a6bb5;
+  font-family: monospace;
+  background: #f0f6ff;
+  border-radius: 6px;
+  padding: 5px 10px;
+}
+
+
